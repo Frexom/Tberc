@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall
+CFLAGS=-Wall -Werror -lpthread -ansi -pedantic
 
 #Run le projet
 run: tberc
