@@ -1,13 +1,14 @@
 #include "../includes.h"
 
+typedef struct {
+	int matiere;
+	char pid[10];
+}MSG;
+
 int main(int argc, char *argv[]) {
 
 
 	// Arguments
-	typedef struct {
-		int matiere;
-		int pid;
-	}MSG;
 
 	key_t cle;
 	int msgId;
@@ -38,23 +39,23 @@ int main(int argc, char *argv[]) {
 			// Remplissage de la struct
 
 			requete.matiere = atoi(argv[1]);
-			requete.pid = getpid();
+			sprintf(requete.pid, "%d", getpid());
 
-			// Envoie du message dans la message queue
-
+			// Envoi du message dans la message queue
 			if((msgsnd(msgId, &requete, sizeof(MSG) - sizeof(int), 0)) == -1) {
 				perror("msgsnd");
 				return EXIT_FAILURE;
 			}
+			else{
+				printf("MSG créé avec la clé %x \n", cle);
+				printf("Identificateur de la MSG : %d\n", msgId);
+				printf("Matière demandée : %d\n", requete.matiere);
+				printf("PIDclient : %d\n", getpid());
+				printf("Envoi réussi\n");
+			}
 		} else {
 			return EXIT_FAILURE;
 		}
-
-		// Messages de vérification
-
-		printf("MSG créé avec la clé %x \n", cle);
-		printf("Identificateur de la MSG : %d\n", msgId);
-		printf("Matière demandée : %d\n", requete.matiere);
 
 		return EXIT_SUCCESS;
 	} else {

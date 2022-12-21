@@ -2,7 +2,9 @@
 
 struct MSG {
     int numMatiere;
+    char pid[10];
 }MSG;
+
 
 int main(int argc, char const *argv[]) {
 
@@ -25,10 +27,12 @@ int main(int argc, char const *argv[]) {
 
     struct MSG msg;
 
-    msgrcv(fifo, &msg, sizeof(MSG), -5, 0);
+    msgrcv(fifo, &msg, sizeof(MSG), 0, 0);
     sleep(2);
     printf("Côté serveur, message reçu\n");
     printf("Numéro de matière : %d\n", msg.numMatiere);
+    printf("PID : %s\n", msg.pid);
+
 
     printf("Fin serveur\n");
     return 0;
