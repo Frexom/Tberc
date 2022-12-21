@@ -6,6 +6,7 @@ int main(int argc, char *argv[]) {
 	// Arguments
 	typedef struct {
 		int matiere;
+		int pid;
 	}MSG;
 
 	key_t cle;
@@ -37,6 +38,7 @@ int main(int argc, char *argv[]) {
 			// Remplissage de la struct
 
 			requete.matiere = atoi(argv[1]);
+			requete.pid = getpid();
 
 			// Envoie du message dans la message queue
 
