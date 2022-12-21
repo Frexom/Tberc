@@ -34,6 +34,16 @@ int main(int argc, char const *argv[]) {
     printf("PID : %s\n", msg.pid);
 
 
+    mkfifo(msg.pid, 0666);
+    char path[20] = "/tmp/";
+    strcat(path, msg.pid);
+    int fd = open(path, O_WRONLY);
+
+    char moyenne[10];
+    sprintf(moyenne, "%f", 10.5);
+    write(fd, moyenne, strlen(moyenne)+1);
+
+
     printf("Fin serveur\n");
     return 0;
 }
