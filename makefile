@@ -1,18 +1,15 @@
 CC=gcc
-CFLAGS=-Wall -Werror -lpthread -ansi -pedantic
+CFLAGS=-Wall -Werror -lpthread
 
-#Run le projet
-run: tberc
+runServer: server
 	@echo
-	./tberc
+	./exec/server
 
-#Compiler l'exécutable
-tberc: main.o
-	$(CC) bin/main.o -o tberc
+server: server.o
+	$(CC) bin/server.o -o exec/server
 
-#Compiler main.c en main.o
-main.o: main.c
-	$(CC) -c main.c -o bin/main.o $(CFLAGS)
+server.o: files/server.c
+	$(CC) -c files/server.c -o bin/server.o $(CFLAGS)
 
 #Nettoyer avec 'make clean'
 clean:
