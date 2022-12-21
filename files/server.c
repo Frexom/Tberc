@@ -42,6 +42,7 @@ int main(int argc, char const *argv[]) {
     char moyenne[10];
     sprintf(moyenne, "%f", 10.5);
     write(fd, moyenne, strlen(moyenne)+1);
+    close(fd);
 
 
     printf("Fin serveur\n");
