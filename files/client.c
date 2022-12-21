@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 				printf("Identificateur de la MSG : %d\n", msgId);
 				printf("Matière demandée : %d\n", requete.matiere);
 				printf("PIDclient : %d\n", getpid());
-				printf("Envoi réussi\n");
+				printf("Envoi réussi\n\n");
 
 			}
 
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 			int fd = open(path, O_RDONLY);
 			read(fd, moyenne, 10);
 			close(fd);
-			
+
 			float valeur = atof(moyenne);
 			printf("Moyenne reçue : %f\n", valeur);
 

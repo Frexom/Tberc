@@ -1,11 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -Werror -lpthread
 
-run: server
-	@echo
-	./exec/server &
-	./exec/client 1
-
 server: server.o
 	$(CC) bin/server.o -o exec/server
 
