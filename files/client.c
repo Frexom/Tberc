@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
 
 
 	// Arguments
-
+	char moyenne[10];
 	key_t cle;
 	int msgId;
 	MSG requete;
@@ -52,7 +52,17 @@ int main(int argc, char *argv[]) {
 				printf("Matière demandée : %d\n", requete.matiere);
 				printf("PIDclient : %d\n", getpid());
 				printf("Envoi réussi\n");
+
 			}
+			char path[] = "/tmp/";
+			strcat(path, requete.pid);
+			mkfifo(path,0666);
+			int fd = open(path, O_RDONLY);
+			read(fd, moyenne, 10);
+
+			float valeur = atof(moyenne);
+			printf("Moyenne reçue : %f\n", valeur);
+
 		} else {
 			return EXIT_FAILURE;
 		}
