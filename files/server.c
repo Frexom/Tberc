@@ -25,10 +25,11 @@ int main(int argc, char const *argv[]) {
 
     struct MSG msg;
 
-    int error = msgrcv(fifo, &msg, sizeof(MSG), -5, 0);
-    printf("Erreur : %d", error);
+    msgrcv(fifo, &msg, sizeof(MSG), -5, 0);
+    sleep(2);
+    printf("Côté serveur, message reçu\n");
     printf("Numéro de matière : %d\n", msg.numMatiere);
 
-    printf("Fin\n");
+    printf("Fin serveur\n");
     return 0;
 }
