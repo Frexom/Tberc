@@ -15,7 +15,7 @@ typedef struct Matiere {
 
 int creerZDC(int size, char* name, int ncle){
     key_t key = ftok(name, ncle);
-    return shmget(key, size, IPC_CREAT);
+    return shmget(key, size, IPC_CREAT | 0660);
 }
 
 //Constructeur d'une Matière
@@ -40,7 +40,7 @@ int main(int argc, char const *argv[]) {
     moyennes[4] = creerMatiere(5, "Physique", 11.8);
 
     //Création et attachement de la ZDC
-    int zdc = creerZDC(10, "/etc/passwd", 100);
+    int zdc = creerZDC(sizeof(char[10]), "/etc/passwd", 100);
     printf("ZDC créée : %d\n\n", zdc);
     char* pZDC =(char*) shmat(zdc, (void *)0, 0);
 
@@ -81,8 +81,7 @@ int main(int argc, char const *argv[]) {
         sprintf(moyenne, "%f", moyennes[msg.numMatiere-1].moyenne);
         moyenne[4] = '\0';
 
-        //memcpy(&zdc, moyenne, sizeof(moyenne));
-        pZDC =  moyenne;
+        memcpy(pZDC, moyenne, sizeof(moyenne));
         printf("Moyenne envoyée : %s\n\n", pZDC);
 
     }

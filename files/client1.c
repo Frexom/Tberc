@@ -38,7 +38,6 @@ int main(int argc, char *argv[]) {
 
 
 	// Initialisation des variables
-	char* moyenneStr;
 	key_t cle;
 	int msgId;
 	MSG requete;
@@ -86,15 +85,16 @@ int main(int argc, char *argv[]) {
 		// Création de la ZDC
 
 		key_t key = ftok("/etc/passwd", 100);
-		int shmId = shmget(key, 10, IPC_EXCL);
+		int shmId = shmget(key, sizeof(char[10]), IPC_EXCL);
 		printf("ZDC créée : %d\n\n", shmId);
 
-		printf("SHMAT\n");
-		char* pZDC =(char*) shmat(shmId, (void *)0, 0);
-		printf("ATOF\n");
-		moyenneStr = pZDC;
-		float moyenne = atof(moyenneStr);
-		printf("DETACH\n");
+		char* pZDC = shmat(shmId, (void *) 0, 0);
+		if(pZDC  == (char *) -1){
+			perror("shmat");
+			exit(1);
+		};
+		printf("CONTENU : %s\n", pZDC);
+		float moyenne = atof(pZDC);
 		shmdt(pZDC);
 
 		printf("Moyenne : %f\n", moyenne);
