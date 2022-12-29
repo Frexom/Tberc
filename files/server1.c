@@ -13,6 +13,11 @@ typedef struct Matiere {
     float moyenne;
 }Matiere;
 
+int creerZDC(int size, char* name, int ncle){
+    key_t key = ftok(name, ncle);
+    return shmget(key, size, IPC_CREAT);
+}
+
 //Constructeur d'une Matière
 Matiere creerMatiere(int id, char* nom, float moyenne){
         Matiere m;
@@ -33,6 +38,11 @@ int main(int argc, char const *argv[]) {
     moyennes[2] = creerMatiere(3, "Informatique", 9.3);
     moyennes[3] = creerMatiere(4, "CultureG", 12.6);
     moyennes[4] = creerMatiere(5, "Physique", 11.8);
+
+    //Création et attachement de la ZDC
+    int zdc = creerZDC(10, "/etc/passwd", 100);
+    printf("ZDC créée : %d\n\n", zdc);
+    shmat(zdc, NULL, 0);
 
     //Pour rester tout le temps actif
     while(1){
@@ -65,24 +75,18 @@ int main(int argc, char const *argv[]) {
         //Impression des logs
         printf("Côté serveur, message reçu\n");
         printf("Numéro de matière : %d\n", msg.numMatiere);
-        printf("PID : %s\n", msg.pid);
         printf("Moyenne envoyée : %f\n\n", moyennes[msg.numMatiere-1].moyenne);
 
-
-        //Création du pipe nommé
-        char path[20] = "/tmp/";
-        strcat(path, msg.pid);
-        mkfifo(path, 0666);
-        int fd = open(path, O_WRONLY);
-
-        //Écriture dans le pipe
+        //Écriture dans la ZDC
         char moyenne[10];
         sprintf(moyenne, "%f", moyennes[msg.numMatiere-1].moyenne);
-        write(fd, moyenne, strlen(moyenne)+1);
-        close(fd);
+        memcpy(&zdc, moyenne, sizeof(moyenne));
+
+
     }
 
 
     printf("Fin serveur\n");
     return 0;
+
 }
