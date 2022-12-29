@@ -3,17 +3,17 @@
 int creerZDC(int size, char *name, int ncle) {
 
 	key_t key = ftok(name, ncle);
-	int shmId = shmget(key, size, IPC_CREAT | IPC_EXCL | 0600);
+	int shmId = shmget(key, size, IPC_EXCL);
 
 	if (shmId == -1) {
-		printf("Elle existe\n");
+		printf("La ZDC existe\n");
 		shmId = shmget(key, size, IPC_EXCL);
 		if(shmId == -1) {
 			perror("shmget");
 			return -1;
 		}
 	}
-	printf("%d\n", shmId);
+	printf("ZDC : %d\n", shmId);
 	return shmId;
 }
 
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 
 
 	// Initialisation des variables
-	char moyenne[10];
+	char* moyenneStr;
 	key_t cle;
 	int msgId;
 	MSG requete;
@@ -85,13 +85,16 @@ int main(int argc, char *argv[]) {
 
 		// Création de la ZDC
 
-		int zdc = creerZDC(100, "/etc/passwd", 100);
-		if (zdc == -1) {
-			perror("Shared memory");
-		}
+		key_t key = ftok("/etc/passwd", 100);
+		int shmId = shmget(key, 10, IPC_EXCL);
+		printf("ZDC créée : %d\n\n", shmId);
 
-		char* pZDC = shmat(zdc, NULL, 0);
-		float moyenne = atof(*pZDC);
+		printf("SHMAT\n");
+		char* pZDC =(char*) shmat(shmId, (void *)0, 0);
+		printf("ATOF\n");
+		moyenneStr = pZDC;
+		float moyenne = atof(moyenneStr);
+		printf("DETACH\n");
 		shmdt(pZDC);
 
 		printf("Moyenne : %f\n", moyenne);

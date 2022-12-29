@@ -42,7 +42,7 @@ int main(int argc, char const *argv[]) {
     //Création et attachement de la ZDC
     int zdc = creerZDC(10, "/etc/passwd", 100);
     printf("ZDC créée : %d\n\n", zdc);
-    shmat(zdc, NULL, 0);
+    char* pZDC =(char*) shmat(zdc, (void *)0, 0);
 
     //Pour rester tout le temps actif
     while(1){
@@ -75,13 +75,15 @@ int main(int argc, char const *argv[]) {
         //Impression des logs
         printf("Côté serveur, message reçu\n");
         printf("Numéro de matière : %d\n", msg.numMatiere);
-        printf("Moyenne envoyée : %f\n\n", moyennes[msg.numMatiere-1].moyenne);
 
         //Écriture dans la ZDC
         char moyenne[10];
         sprintf(moyenne, "%f", moyennes[msg.numMatiere-1].moyenne);
-        memcpy(&zdc, moyenne, sizeof(moyenne));
+        moyenne[4] = '\0';
 
+        //memcpy(&zdc, moyenne, sizeof(moyenne));
+        pZDC =  moyenne;
+        printf("Moyenne envoyée : %s\n\n", pZDC);
 
     }
 
