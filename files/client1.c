@@ -3,7 +3,7 @@
 int creerZDC(int size, char *name, int ncle) {
 
 	key_t key = ftok(name, ncle);
-	int shmId = shmget(key, size, IPC_EXCL);
+	int shmId = shmget(key, size, IPC_CREAT | 0660);
 
 	if (shmId == -1) {
 		printf("La ZDC existe\n");
@@ -17,25 +17,12 @@ int creerZDC(int size, char *name, int ncle) {
 	return shmId;
 }
 
-int detruireZDC(int shmId) {
-	int ret = shmctl(shmId, IPC_RMID, NULL);
-	if (ret == 0) {
-		printf("ZDC d'ID %d détruire\n", shmId);
-		return 0;
-	} else {
-		printf("Erreur pendant la destruction\n");
-		return -1;
-	}
-}
-
-
 typedef struct {
 	int matiere;
 	char pid[10];
 }MSG;
 
 int main(int argc, char *argv[]) {
-
 
 	// Initialisation des variables
 	key_t cle;
@@ -83,21 +70,34 @@ int main(int argc, char *argv[]) {
 		}
 
 		// Création de la ZDC
-
-		key_t key = ftok("/etc/passwd", 100);
-		int shmId = shmget(key, sizeof(char[10]), IPC_EXCL);
+		int shmId = creerZDC(sizeof(char[10]), "/etc/passwd", 100);
 		printf("ZDC créée : %d\n\n", shmId);
 
+		//Attachement de la ZDC
 		char* pZDC = shmat(shmId, (void *) 0, 0);
 		if(pZDC  == (char *) -1){
 			perror("shmat");
 			exit(1);
 		};
-		printf("CONTENU : %s\n", pZDC);
-		float moyenne = atof(pZDC);
+
+		//Lecture de la ZDC
+		while(pZDC[0] == '*'){
+			usleep(200);		//Réessaies dans 0.2 milisecondes
+		}
+		char* contenu = pZDC;
+		printf("CONTENU : %s\n", contenu);
+		float moyenne = atof(contenu);
+
+		//Vidage de la ZDC
+		memset(pZDC, '\0', strlen(pZDC)+1);
+		*pZDC = '*';
+
+		//Détachement de la ZDC
 		shmdt(pZDC);
 
 		printf("Moyenne : %f\n", moyenne);
+
+
 		return EXIT_SUCCESS;
 	} else {
 		printf("Veuillez spécifier un paramètre numérique entre 1 et 5 inclus.\n");

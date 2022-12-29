@@ -13,9 +13,21 @@ typedef struct Matiere {
     float moyenne;
 }Matiere;
 
-int creerZDC(int size, char* name, int ncle){
-    key_t key = ftok(name, ncle);
-    return shmget(key, size, IPC_CREAT | 0660);
+int creerZDC(int size, char *name, int ncle) {
+
+	key_t key = ftok(name, ncle);
+	int shmId = shmget(key, size, IPC_CREAT | 0660);
+
+	if (shmId == -1) {
+		printf("La ZDC existe\n");
+		shmId = shmget(key, size, IPC_EXCL);
+		if(shmId == -1) {
+			perror("shmget");
+			return -1;
+		}
+	}
+	printf("ZDC : %d\n", shmId);
+	return shmId;
 }
 
 //Constructeur d'une Matière
@@ -82,7 +94,7 @@ int main(int argc, char const *argv[]) {
         moyenne[4] = '\0';
 
         memcpy(pZDC, moyenne, sizeof(moyenne));
-        printf("Moyenne envoyée : %s\n\n", pZDC);
+        printf("Moyenne envoyée : %s\n\n", moyenne);
 
     }
 
