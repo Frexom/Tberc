@@ -4,10 +4,10 @@ CFLAGS=-Wall -Werror -lpthread
 
 #Compilation serveur 1 ou 2
 server2: server2.o
-	$(CC) bin/server.o -o exec/server2
+	$(CC) bin/server2.o -o exec/server2
 
-server2.o: files/server.c
-	$(CC) -c files/server.c -o bin/server.o $(CFLAGS)
+server2.o: files/server2.c
+	$(CC) -c files/server2.c -o bin/server2.o $(CFLAGS)
 
 server1: server1.o
 	$(CC) bin/server1.o -o exec/server1
