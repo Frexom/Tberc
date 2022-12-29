@@ -1,5 +1,34 @@
 #include "../includes.h"
 
+int creerZDC(int size, char *name, int ncle) {
+
+	key_t key = ftok(name, ncle);
+	int shmId = shmget(key, size, IPC_CREAT | IPC_EXCL | 0600);
+
+	if (shmId == -1) {
+		printf("Elle existe\n");
+		shmId = shmget(key, size, IPC_EXCL);
+		if(shmId == -1) {
+			perror("shmget");
+			return -1;
+		}
+	}
+	printf("%d\n", shmId);
+	return shmId;
+}
+
+int detruireZDC(int shmId) {
+	int ret = shmctl(shmId, IPC_RMID, NULL);
+	if (ret == 0) {
+		printf("ZDC d'ID %d détruire\n", shmId);
+		return 0;
+	} else {
+		printf("Erreur pendant la destruction\n");
+		return -1;
+	}
+}
+
+
 typedef struct {
 	int matiere;
 	char pid[10];
@@ -52,32 +81,20 @@ int main(int argc, char *argv[]) {
 			printf("Matière demandée : %d\n", requete.matiere);
 			printf("PIDclient : %d\n", getpid());
 			printf("Envoi réussi\n\n");
-
 		}
 
-		// Création du pipe nommé en lecture
-		char path[] = "/tmp/";
-		strcat(path, requete.pid);
-		mkfifo(path,0666);
-		int fd = open(path, O_RDONLY);
-		//Lecture
-		read(fd, moyenne, 10);
+		// Création de la ZDC
 
-		//Fermeture
-		close(fd);
+		int zdc = creerZDC(100, "/etc/passwd", 100);
+		if (zdc == -1) {
+			perror("Shared memory");
+		}
 
-		//Suppression du pipe sur le disque
-		char command[30] = "rm ";
-		strcat(command, "/tmp/");
-		strcat(command, requete.pid);
-		printf("%s\n", command);
-		system(command);
+		char* pZDC = shmat(zdc, NULL, 0);
+		float moyenne = atof(*pZDC);
+		shmdt(pZDC);
 
-		//Impression
-		float valeur = atof(moyenne);
-		printf("Moyenne reçue : %f\n", valeur);
-
-
+		printf("Moyenne : %f\n", moyenne);
 		return EXIT_SUCCESS;
 	} else {
 		printf("Veuillez spécifier un paramètre numérique entre 1 et 5 inclus.\n");
